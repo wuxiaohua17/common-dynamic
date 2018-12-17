@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+	<property resource="config/application.properties" />
+	<if condition='property("os.name").toLowerCase().contains("windows")'>
+		<then>
+			<property name="logger.path" value="D:/logs/${spring.config.name}" />
+		</then>
+		<else>
+			<property name="logger.path" value="/var/log/${spring.config.name}" />
+		</else>
+	</if>
+
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} %-5level [%thread] %caller{1} - %msg%n
+			</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="FILE"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${logger.path}/${spring.config.name}.log</file>
+		<!-- <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy"> -->
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<fileNamePattern>${logger.path}/${spring.config.name}.%d{yyyy-MM-dd}.%i.log
+			</fileNamePattern>
+			<maxFileSize>100MB</maxFileSize>
+			<maxHistory>30</maxHistory>
+			<totalSizeCap>2GB</totalSizeCap>
+		</rollingPolicy>
+		<encoder>
+			<!-- <pattern>%d{HH:mm:ss.SSS} %-5level [%thread] %logger{0} %L - %msg%n</pattern> -->
+			<pattern>%d{HH:mm:ss.SSS} %-5level [%thread] %caller{1} - %msg%n
+			</pattern>
+		</encoder>
+	</appender>
+
+<!-- 	<appender name="LOGSTASH"
+		class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+		<destination>192.168.8.83:9250</destination>
+		encoder必须配置,有多种可选
+		<encoder charset="UTF-8"
+			class="net.logstash.logback.encoder.LogstashEncoder" >
+			<customFields>{"projectName":"esf-pc-${spring.config.name}"}</customFields>
+			</encoder>
+	</appender> -->
+
+	<logger name="org.apache.commons" level="WARN" />
+	<logger name="org.quartz" level="WARN" />
+	<logger name="org.apache.hadoop" level="WARN" />
+	<logger name="com.google.code.yanf4j" level="WARN" />
+	<logger name="net.rubyeye.xmemcached" level="WARN" />
+	<logger name="com.alibaba.druid" level="WARN" />
+	<logger name="net.sf.ehcache" level="WARN" />
+	<logger name="org.springframework" level="WARN" />
+	<logger name="cn.com.ut" level="DEBUG" />
+
+	<root level="WARN">
+		<if condition='property("os.name").toLowerCase().contains("windows")'>
+			<then>
+				<appender-ref ref="STDOUT" />
+			</then>
+		</if>
+		<appender-ref ref="FILE" />
+		<!-- <appender-ref ref="LOGSTASH" /> -->
+	</root>
+
+</configuration>
